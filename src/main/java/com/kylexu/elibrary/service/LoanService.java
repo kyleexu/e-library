@@ -1,5 +1,7 @@
 package com.kylexu.elibrary.service;
 
+import com.kylexu.elibrary.common.ApiCode;
+import com.kylexu.elibrary.common.BusinessException;
 import com.kylexu.elibrary.dto.BorrowBookRequest;
 import com.kylexu.elibrary.dto.CurrentLoanItem;
 import com.kylexu.elibrary.mapper.BookMapper;
@@ -9,6 +11,7 @@ import com.kylexu.elibrary.model.Loan;
 import com.kylexu.elibrary.model.LoanStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,6 +43,7 @@ public class LoanService {
      *
      * @param request 借阅请求（userId、bookId、借阅天数）
      */
+    @Transactional
     public void borrowBook(String userId, BorrowBookRequest request) {
         Long bookId = request.getBookId();
         int loanDays = resolveLoanDays(request.getLoanDays());
@@ -47,19 +51,24 @@ public class LoanService {
         // 1. 查看是否存在这个书，不存在 --> 异常
         Book book = bookMapper.findById(bookId);
         if (book == null) {
-            throw new RuntimeException("No this book");
+            throw new BusinessException(ApiCode.NOT_FOUND, "No this book");
         }
         // 2. 查看当前还有没有库存，没有库存了 --> 异常
         if (book.getAvailableCopies() == 0) {
-            throw new RuntimeException("Not Available");
+            throw new BusinessException(ApiCode.CONFLICT, "Not Available");
         }
-        // 3. 构建 loan 对象，并写入
+        // 3. 同一用户对同一本书未归还时不能再借
+        Loan activeLoan = loanMapper.findActiveByUserAndBook(userId, bookId);
+        if (activeLoan != null) {
+            throw new BusinessException(ApiCode.CONFLICT, "Already borrowed");
+        }
+        // 4. 构建 loan 对象，并写入
         Loan loan = this.buildLoan(userId, book, loanDays);
         loanMapper.insert(loan);
-        // 4. 借出时，扣减书本数量
+        // 5. 借出时，扣减书本数量
         int i = bookMapper.decreaseAvailableCopies(bookId);
         if (i == 0) {
-            throw new RuntimeException("借出失败");
+            throw new BusinessException(ApiCode.CONFLICT, "借出失败");
         }
     }
 
@@ -68,7 +77,7 @@ public class LoanService {
             return LOAN_DAYS;
         }
         if (loanDays != 14 && loanDays != 30) {
-            throw new RuntimeException("loanDays must be 14 or 30");
+            throw new BusinessException(ApiCode.BAD_REQUEST, "loanDays must be 14 or 30");
         }
         return loanDays;
     }
@@ -91,29 +100,30 @@ public class LoanService {
      * @param userId 当前用户 ID
      * @param loanId 借阅单 ID
      */
+    @Transactional
     public void returnBook(String userId, Long loanId) {
         // 1. 查看是否存在这个借书记录，不存在 --> 异常
         Loan loan = loanMapper.findById(loanId);
         if (loan == null) {
-            throw new RuntimeException("No this loan");
+            throw new BusinessException(ApiCode.NOT_FOUND, "No this loan");
         }
         // 2. 只能归还自己的借阅单
         if (!userId.equals(loan.getUserId())) {
-            throw new RuntimeException("Not your loan");
+            throw new BusinessException(ApiCode.CONFLICT, "Not your loan");
         }
         // 3. 已归还则不能再还
         if (loan.getStatus() != LoanStatus.BORROWED) {
-            throw new RuntimeException("Already returned");
+            throw new BusinessException(ApiCode.CONFLICT, "Already returned");
         }
         // 4. 修改 loan 状态为已归还
         int updated = loanMapper.markReturned(loanId, LoanStatus.RETURNED, LocalDateTime.now());
         if (updated == 0) {
-            throw new RuntimeException("Already returned");
+            throw new BusinessException(ApiCode.CONFLICT, "Already returned");
         }
         // 5. 对应书本剩余本数 + 1
         int i = bookMapper.increaseAvailableCopies(loan.getBookId());
         if (i == 0) {
-            throw new RuntimeException("归还失败");
+            throw new BusinessException(ApiCode.CONFLICT, "归还失败");
         }
     }
 
