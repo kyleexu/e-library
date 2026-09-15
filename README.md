@@ -34,7 +34,7 @@ model/        Book / Loan 等领域模型
 common/       ApiResponse、全局异常处理
 dto/          请求/响应 DTO
 resources/schema.sql / data.sql
-scripts/run.sh
+scripts/run.sh / stop.sh
 ```
 
 ## How to Run
@@ -47,6 +47,10 @@ scripts/run.sh
 ./scripts/run.sh
 # 可选端口
 PORT=8081 ./scripts/run.sh
+
+# 停止
+./scripts/stop.sh
+PORT=8081 ./scripts/stop.sh
 ```
 
 - 日志：`data/e-library.log`
