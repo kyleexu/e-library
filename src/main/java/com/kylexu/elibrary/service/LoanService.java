@@ -1,11 +1,15 @@
 package com.kylexu.elibrary.service;
 
+import com.kylexu.elibrary.dto.BorrowBookRequest;
 import com.kylexu.elibrary.dto.CurrentLoanItem;
 import com.kylexu.elibrary.mapper.BookMapper;
 import com.kylexu.elibrary.mapper.LoanMapper;
 import com.kylexu.elibrary.model.Book;
 import com.kylexu.elibrary.model.Loan;
 import com.kylexu.elibrary.model.LoanStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -15,8 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  * 借阅领域服务：借阅、归还、查询当前用户已借阅列表。
@@ -36,10 +38,12 @@ public class LoanService {
     /**
      * 借阅书籍。
      *
-     * @param userId 当前用户 ID
-     * @param bookId 书籍 ID
+     * @param request 借阅请求（userId、bookId、借阅天数）
      */
-    public void borrowBook(String userId, Long bookId) {
+    public void borrowBook(String userId, BorrowBookRequest request) {
+        Long bookId = request.getBookId();
+        int loanDays = resolveLoanDays(request.getLoanDays());
+
         // 1. 查看是否存在这个书，不存在 --> 异常
         Book book = bookMapper.findById(bookId);
         if (book == null) {
@@ -50,7 +54,7 @@ public class LoanService {
             throw new RuntimeException("Not Available");
         }
         // 3. 构建 loan 对象，并写入
-        Loan loan = this.buildLoan(userId, book);
+        Loan loan = this.buildLoan(userId, book, loanDays);
         loanMapper.insert(loan);
         // 4. 借出时，扣减书本数量
         int i = bookMapper.decreaseAvailableCopies(bookId);
@@ -59,14 +63,24 @@ public class LoanService {
         }
     }
 
-    private Loan buildLoan(String userId, Book book) {
+    private int resolveLoanDays(Integer loanDays) {
+        if (loanDays == null) {
+            return LOAN_DAYS;
+        }
+        if (loanDays != 14 && loanDays != 30) {
+            throw new RuntimeException("loanDays must be 14 or 30");
+        }
+        return loanDays;
+    }
+
+    private Loan buildLoan(String userId, Book book, int loanDays) {
         LocalDateTime now = LocalDateTime.now();
         Loan loan = new Loan();
         loan.setUserId(userId);
         loan.setBookId(book.getId());
         loan.setStatus(LoanStatus.BORROWED);
         loan.setBorrowedAt(now);
-        loan.setDueAt(now.plusDays(LOAN_DAYS));
+        loan.setDueAt(now.plusDays(loanDays));
         loan.setReturnedAt(null);
         return loan;
     }
