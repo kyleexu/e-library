@@ -106,7 +106,7 @@ class LoanServiceTest {
 
 	@Test
 	void returnBook_whenLoanNotFound_throwsNotFound() {
-		when(loanMapper.findById(999L)).thenReturn(null);
+		when(loanMapper.findActiveByUserAndBook("u1", 999L)).thenReturn(null);
 
 		BusinessException ex = assertThrows(
 				BusinessException.class,
@@ -129,11 +129,11 @@ class LoanServiceTest {
 		loan.setBookId(bookId);
 		loan.setStatus(LoanStatus.BORROWED);
 
-		when(loanMapper.findById(loanId)).thenReturn(loan);
+		when(loanMapper.findActiveByUserAndBook(userId, bookId)).thenReturn(loan);
 		when(loanMapper.markReturned(eq(loanId), eq(LoanStatus.RETURNED), any())).thenReturn(1);
 		when(bookMapper.increaseAvailableCopies(bookId)).thenReturn(1);
 
-		loanService.returnBook(userId, loanId);
+		loanService.returnBook(userId, bookId);
 
 		verify(loanMapper).markReturned(eq(loanId), eq(LoanStatus.RETURNED), any());
 		verify(bookMapper).increaseAvailableCopies(bookId);

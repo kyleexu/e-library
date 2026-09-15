@@ -98,30 +98,22 @@ public class LoanService {
      * 归还书籍。
      *
      * @param userId 当前用户 ID
-     * @param loanId 借阅单 ID
+     * @param bookId 书籍 ID
      */
     @Transactional
-    public void returnBook(String userId, Long loanId) {
-        // 1. 查看是否存在这个借书记录，不存在 --> 异常
-        Loan loan = loanMapper.findById(loanId);
+    public void returnBook(String userId, Long bookId) {
+        // 1. 查找该用户对该书的未归还借阅
+        Loan loan = loanMapper.findActiveByUserAndBook(userId, bookId);
         if (loan == null) {
             throw new BusinessException(ApiCode.NOT_FOUND, "No this loan");
         }
-        // 2. 只能归还自己的借阅单
-        if (!userId.equals(loan.getUserId())) {
-            throw new BusinessException(ApiCode.CONFLICT, "Not your loan");
-        }
-        // 3. 已归还则不能再还
-        if (loan.getStatus() != LoanStatus.BORROWED) {
-            throw new BusinessException(ApiCode.CONFLICT, "Already returned");
-        }
-        // 4. 修改 loan 状态为已归还
-        int updated = loanMapper.markReturned(loanId, LoanStatus.RETURNED, LocalDateTime.now());
+        // 2. 修改 loan 状态为已归还
+        int updated = loanMapper.markReturned(loan.getId(), LoanStatus.RETURNED, LocalDateTime.now());
         if (updated == 0) {
             throw new BusinessException(ApiCode.CONFLICT, "Already returned");
         }
-        // 5. 对应书本剩余本数 + 1
-        int i = bookMapper.increaseAvailableCopies(loan.getBookId());
+        // 3. 对应书本剩余本数 + 1
+        int i = bookMapper.increaseAvailableCopies(bookId);
         if (i == 0) {
             throw new BusinessException(ApiCode.CONFLICT, "归还失败");
         }

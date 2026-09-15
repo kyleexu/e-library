@@ -264,12 +264,12 @@
         <div class="op">
           <h3>4. 归还</h3>
           <div class="row">
-            <label>loanId
-              <input id="returnLoanId" type="number" value="1" />
+            <label>bookId
+              <input id="returnBookId" type="number" value="1" />
             </label>
             <button type="button" onclick="returnBook()">归还</button>
           </div>
-          <p class="hint">归还前在上方填写 loanId。</p>
+          <p class="hint">归还前在上方填写 bookId。</p>
         </div>
 
         <div class="op">
@@ -501,8 +501,8 @@
   }
 
   async function returnBook() {
-    const id = document.getElementById('returnLoanId').value;
-    const data = await call('POST', '/api/loans/' + id + '/return');
+    const id = document.getElementById('returnBookId').value;
+    const data = await call('POST', '/api/loans/return?bookId=' + id);
     if (data && data.code === 0) await listMyLoans();
   }
 

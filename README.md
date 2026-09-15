@@ -126,7 +126,7 @@ curl -X POST "http://localhost:8080/api/loans" \
 ### 归还
 
 ```bash
-curl -X POST "http://localhost:8080/api/loans/1/return" \
+curl -X POST "http://localhost:8080/api/loans/return?bookId=1" \
   -H "X-User-Id: u1"
 ```
 

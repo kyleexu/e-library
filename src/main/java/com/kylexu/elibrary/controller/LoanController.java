@@ -30,14 +30,14 @@ public class LoanController {
     /**
      * 归还书籍。
      *
-     * @param loanId 借阅单 ID
+     * @param bookId 书籍 ID
      * @param userId 当前用户 ID（请求头 X-User-Id）
      */
-    @PostMapping("/{loanId}/return")
+    @PostMapping("/return")
     public ApiResponse<Void> returnBook(
-            @PathVariable Long loanId,
+            @RequestParam Long bookId,
             @RequestHeader("X-User-Id") String userId) {
-        loanService.returnBook(userId, loanId);
+        loanService.returnBook(userId, bookId);
         return ApiResponse.success();
     }
 }
