@@ -5,9 +5,11 @@ import com.kylexu.elibrary.mapper.LoanMapper;
 import com.kylexu.elibrary.model.Book;
 import com.kylexu.elibrary.model.Loan;
 import com.kylexu.elibrary.model.LoanStatus;
-import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 借阅领域服务：借阅、归还、查询当前用户已借阅列表。
@@ -41,7 +43,10 @@ public class LoanService {
         Loan loan = this.buildLoan(userId, book);
         loanMapper.insert(loan);
         // 4. 借出时，扣减书本数量
-        bookMapper.decreaseAvailableCopies(bookId);
+        int i = bookMapper.decreaseAvailableCopies(bookId);
+        if (i == 0) {
+            throw new RuntimeException("借出失败");
+        }
     }
 
     private Loan buildLoan(String userId, Book book) {
@@ -76,7 +81,10 @@ public class LoanService {
             throw new RuntimeException("Already returned");
         }
         // 5. 对应书本剩余本数 + 1
-        bookMapper.increaseAvailableCopies(loan.getBookId());
+        int i = bookMapper.increaseAvailableCopies(loan.getBookId());
+        if (i == 0) {
+            throw new RuntimeException("归还失败");
+        }
     }
 
     /**
@@ -86,6 +94,7 @@ public class LoanService {
      */
     public void listCurrentLoans(String userId) {
         // TODO: 实现我的借阅列表
+        List<Loan> loanList = loanMapper.findCurrentByUserId(userId);
 
     }
 }
