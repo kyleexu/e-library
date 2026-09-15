@@ -5,8 +5,8 @@ package com.kylexu.elibrary.model;
  */
 public enum BookType {
 
-	/** 电子书。 */
-	EBOOK,
+	/** 计算机。 */
+	COMPUTER,
 
 	/** 期刊。 */
 	JOURNAL,
@@ -21,5 +21,20 @@ public enum BookType {
 	NOVEL,
 
 	/** 工具书。 */
-	REFERENCE
+	REFERENCE,
+
+	/** 历史。 */
+	HISTORY,
+
+	/** 科普。 */
+	SCIENCE,
+
+	/** 艺术。 */
+	ART,
+
+	/** 传记。 */
+	BIOGRAPHY,
+
+	/** 儿童。 */
+	KIDS
 }

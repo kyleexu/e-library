@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>E-Library 测试页</title>
+  <style>
+    :root {
+      --bg: #f4f1ea;
+      --ink: #1c1917;
+      --muted: #78716c;
+      --line: #e7e5e4;
+      --card: #fffdf9;
+      --accent: #0f766e;
+      --danger: #b91c1c;
+      --ok: #047857;
+      --panel: #fafaf9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", sans-serif;
+      background: radial-gradient(1000px 500px at 0% 0%, #ccfbf1 0%, transparent 50%),
+                  radial-gradient(800px 400px at 100% 0%, #fde68a44 0%, transparent 45%),
+                  var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+      min-height: 100vh;
+    }
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+    header { margin-bottom: 18px; }
+    h1 { margin: 0 0 6px; font-size: 26px; letter-spacing: -0.02em; }
+    .sub { margin: 0; color: var(--muted); font-size: 14px; }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(300px, 380px) 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .op {
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+    .op:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
+    .op h3 { margin: 0 0 8px; font-size: 15px; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+    label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); flex: 1 1 120px; }
+    input, select, button {
+      font: inherit;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      background: #fff;
+      color: var(--ink);
+    }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button.secondary { background: #44403c; }
+    button.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+    button:hover { filter: brightness(1.05); }
+    .hint { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+    .right-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .right-head h2 { margin: 0; }
+    #history {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: calc(100vh - 140px);
+      overflow: auto;
+      padding-right: 2px;
+    }
+    .empty {
+      color: var(--muted);
+      font-size: 14px;
+      padding: 24px 8px;
+      text-align: center;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .card.fail { border-color: #fecaca; }
+    .card-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      align-items: center;
+      padding: 10px 12px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge.ok { background: #d1fae5; color: var(--ok); }
+    .badge.err { background: #fee2e2; color: var(--danger); }
+    .meta { color: var(--muted); font-size: 12px; }
+    .path { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    .card-body { padding: 10px 12px 12px; }
+    .kv {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 6px 10px;
+      font-size: 14px;
+    }
+    .kv dt { color: var(--muted); }
+    .kv dd { margin: 0; word-break: break-word; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; border-radius: 8px; overflow: hidden; }
+    th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 11px; background: #fafaf9; }
+    tr:last-child td { border-bottom: 0; }
+    .msg {
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+    }
+    .msg.err { background: #fef2f2; color: var(--danger); }
+    .msg.ok { background: #ecfdf5; color: var(--ok); }
+    details.json {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    details.json summary {
+      cursor: pointer;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      user-select: none;
+    }
+    details.json pre {
+      margin: 0;
+      padding: 0 10px 10px;
+      background: #1c1917;
+      color: #f5f5f4;
+      border-radius: 0 0 8px 8px;
+      overflow: auto;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 280px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>E-Library 测试页</h1>
+      <p class="sub">左侧发起操作，右侧查看图形化响应；JSON 默认折叠。</p>
+    </header>
+
+    <div class="layout">
+      <aside class="panel" id="ops">
+        <h2>操作</h2>
+
+        <div class="op">
+          <h3>公共参数</h3>
+          <div class="row">
+            <label>X-User-Id
+              <input id="userId" value="u1" />
+            </label>
+            <label>Base URL（可空）
+              <input id="baseUrl" placeholder="http://localhost:8080" />
+            </label>
+          </div>
+        </div>
+
+        <div class="op">
+          <h3>1. 浏览书籍</h3>
+          <div class="row">
+            <label>关键字 q
+              <input id="q" placeholder="Clean" />
+            </label>
+            <label>类型 type
+              <select id="type">
+                <option value="">全部</option>
+                <option>COMPUTER</option>
+                <option>JOURNAL</option>
+                <option>COMIC</option>
+                <option>MAGAZINE</option>
+                <option>NOVEL</option>
+                <option>REFERENCE</option>
+                <option>HISTORY</option>
+                <option>SCIENCE</option>
+                <option>ART</option>
+                <option>BIOGRAPHY</option>
+                <option>KIDS</option>
+              </select>
+            </label>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button type="button" onclick="listBooks()">查询列表</button>
+          </div>
+        </div>
+
+        <div class="op">
+          <h3>2. 书籍详情</h3>
+          <div class="row">
+            <label>bookId
+              <input id="detailId" type="number" value="1" />
+            </label>
+            <button type="button" onclick="getBook()">查询详情</button>
+          </div>
+        </div>
+
+        <div class="op">
+          <h3>3. 借阅</h3>
+          <div class="row">
+            <label>bookId
+              <input id="borrowBookId" type="number" value="1" />
+            </label>
+            <label>loanDays
+              <select id="loanDays">
+                <option value="14">14</option>
+                <option value="30">30</option>
+              </select>
+            </label>
+            <button type="button" onclick="borrowBook()">借阅</button>
+          </div>
+        </div>
+
+        <div class="op">
+          <h3>4. 归还</h3>
+          <div class="row">
+            <label>loanId
+              <input id="returnLoanId" type="number" value="1" />
+            </label>
+            <button type="button" onclick="returnBook()">归还</button>
+          </div>
+          <p class="hint">归还前在上方填写 loanId。</p>
+        </div>
+
+        <div class="op">
+          <h3>5. 我的当前借阅</h3>
+          <button type="button" onclick="listMyLoans()">刷新我的借阅</button>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <div class="right-head">
+          <h2>最近响应</h2>
+          <button type="button" class="ghost" onclick="clearHistory()">清空</button>
+        </div>
+        <div id="history"><div class="empty">尚未请求</div></div>
+      </section>
+    </div>
+  </div>
+
+<script>
+  const historyEl = document.getElementById('history');
+  let historyItems = [];
+
+  function base() {
+    const v = document.getElementById('baseUrl').value.trim();
+    return v ? v.replace(/\/$/, '') : '';
+  }
+
+  function headers(json) {
+    const h = { 'X-User-Id': document.getElementById('userId').value.trim() || 'u1' };
+    if (json) h['Content-Type'] = 'application/json';
+    return h;
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;');
+  }
+
+  function clearHistory() {
+    historyItems = [];
+    historyEl.innerHTML = '<div class="empty">尚未请求</div>';
+  }
+
+  function inferKind(path, data) {
+    if (!(data && typeof data === 'object')) return 'raw';
+    if (data.code !== 0) return 'error';
+    const payload = data.data;
+    if (path.startsWith('/api/books/') && path !== '/api/books') return 'book';
+    if (path.startsWith('/api/books')) return 'books';
+    if (path.startsWith('/api/me/loans')) return 'loans';
+    if (path.includes('/return') || path === '/api/loans') return 'action';
+    if (Array.isArray(payload)) return 'list';
+    if (payload && typeof payload === 'object') return 'object';
+    return 'action';
+  }
+
+  function renderVisual(kind, data) {
+    if (kind === 'error') {
+      return `<div class="msg err">${escapeHtml(data && data.message ? data.message : '请求失败')}</div>`;
+    }
+    if (kind === 'action') {
+      return `<div class="msg ok">${escapeHtml((data && data.message) || 'OK')}（操作成功）</div>`;
+    }
+    if (kind === 'book' && data && data.data) {
+      const b = data.data;
+      return `<dl class="kv">
+        <dt>ID</dt><dd>${escapeHtml(b.id)}</dd>
+        <dt>标题</dt><dd>${escapeHtml(b.title)}</dd>
+        <dt>作者</dt><dd>${escapeHtml(b.author)}</dd>
+        <dt>类型</dt><dd>${escapeHtml(b.type)}</dd>
+        <dt>ISBN</dt><dd>${escapeHtml(b.isbn)}</dd>
+        <dt>库存</dt><dd>${escapeHtml(b.availableCopies)} / ${escapeHtml(b.totalCopies)}</dd>
+        <dt>简介</dt><dd>${escapeHtml(b.description || '')}</dd>
+      </dl>`;
+    }
+    if (kind === 'books' && Array.isArray(data.data)) {
+      const list = data.data;
+      if (!list.length) return '<div class="msg">无数据</div>';
+      return `<table>
+        <thead><tr><th>ID</th><th>标题</th><th>作者</th><th>类型</th><th>可借</th></tr></thead>
+        <tbody>${list.map(b => `<tr>
+          <td>${escapeHtml(b.id)}</td>
+          <td>${escapeHtml(b.title)}</td>
+          <td>${escapeHtml(b.author)}</td>
+          <td>${escapeHtml(b.type)}</td>
+          <td>${escapeHtml(b.availableCopies)}/${escapeHtml(b.totalCopies)}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+    }
+    if (kind === 'loans' && Array.isArray(data.data)) {
+      const list = data.data;
+      if (!list.length) return '<div class="msg">当前无借阅</div>';
+      return `<table>
+        <thead><tr><th>loanId</th><th>bookId</th><th>标题</th><th>借出</th><th>应还</th><th>天数</th></tr></thead>
+        <tbody>${list.map(l => `<tr>
+          <td>${escapeHtml(l.loanId)}</td>
+          <td>${escapeHtml(l.bookId)}</td>
+          <td>${escapeHtml(l.title || '')}</td>
+          <td>${escapeHtml(l.borrowedAt || '')}</td>
+          <td>${escapeHtml(l.dueAt || '')}</td>
+          <td>${escapeHtml(l.borrowedDays)}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+    }
+    if (kind === 'raw') {
+      return `<div class="msg">${escapeHtml(typeof data === 'string' ? data : JSON.stringify(data))}</div>`;
+    }
+    return `<div class="msg">${escapeHtml((data && data.message) || 'OK')}</div>`;
+  }
+
+  function pushHistory(entry) {
+    // 每次请求只保留最新一条，避免重复点击堆满右侧
+    historyItems = [entry];
+    renderHistory();
+  }
+
+  function renderHistory() {
+    if (!historyItems.length) {
+      historyEl.innerHTML = '<div class="empty">尚未请求</div>';
+      return;
+    }
+    historyEl.innerHTML = historyItems.map((item, idx) => {
+      const ok = item.ok;
+      const kind = inferKind(item.path, item.data);
+      const visual = renderVisual(ok ? kind : 'error', item.data);
+      const jsonText = typeof item.data === 'string'
+        ? item.data
+        : JSON.stringify(item.data, null, 2);
+      return `<article class="card ${ok ? '' : 'fail'}">
+        <div class="card-head">
+          <span class="badge ${ok ? 'ok' : 'err'}">${ok ? 'SUCCESS' : 'ERROR'}</span>
+          <span class="path">${escapeHtml(item.method)} ${escapeHtml(item.path)}</span>
+          <span class="meta">HTTP ${escapeHtml(item.httpStatus)}${item.data && typeof item.data === 'object' && item.data.code != null ? ' · code ' + escapeHtml(item.data.code) : ''}</span>
+          <span class="meta">${escapeHtml(item.time)}</span>
+        </div>
+        <div class="card-body">
+          ${visual}
+          <details class="json">
+            <summary>查看 JSON 响应</summary>
+            <pre>${escapeHtml(jsonText)}</pre>
+          </details>
+        </div>
+      </article>`;
+    }).join('');
+  }
+
+  async function call(method, path, body) {
+    const url = base() + path;
+    const opts = { method, headers: headers(body !== undefined) };
+    if (body !== undefined) opts.body = JSON.stringify(body);
+    const time = new Date().toLocaleTimeString();
+    try {
+      const res = await fetch(url, opts);
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch (_) { data = text; }
+      const ok = data && typeof data === 'object' && data.code === 0;
+      pushHistory({ method, path, httpStatus: res.status, data, ok, time });
+      if (!ok) {
+        const msg = (data && typeof data === 'object')
+          ? `请求失败\nHTTP ${res.status}\ncode: ${data.code}\n${data.message || ''}`
+          : `请求失败\nHTTP ${res.status}\n${text || '未知错误'}`;
+        alert(msg.trim());
+      }
+      return data;
+    } catch (e) {
+      const message = e && e.message ? e.message : String(e);
+      pushHistory({
+        method,
+        path,
+        httpStatus: '-',
+        data: { code: -1, status: 'error', message },
+        ok: false,
+        time
+      });
+      alert('请求异常：' + message);
+      throw e;
+    }
+  }
+
+  async function listBooks() {
+    const q = document.getElementById('q').value.trim();
+    const type = document.getElementById('type').value;
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (type) params.set('type', type);
+    const qs = params.toString();
+    await call('GET', '/api/books' + (qs ? '?' + qs : ''));
+  }
+
+  async function getBook() {
+    await call('GET', '/api/books/' + document.getElementById('detailId').value);
+  }
+
+  async function borrowBook() {
+    const body = {
+      bookId: Number(document.getElementById('borrowBookId').value),
+      loanDays: Number(document.getElementById('loanDays').value)
+    };
+    const data = await call('POST', '/api/loans', body);
+    if (data && data.code === 0) await listMyLoans();
+  }
+
+  async function returnBook() {
+    const id = document.getElementById('returnLoanId').value;
+    const data = await call('POST', '/api/loans/' + id + '/return');
+    if (data && data.code === 0) await listMyLoans();
+  }
+
+  async function listMyLoans() {
+    await call('GET', '/api/me/loans');
+  }
+
+  listBooks().catch(() => {});
+</script>
+</body>
+</html>

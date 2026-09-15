@@ -33,14 +33,19 @@ ensure_h2_db() {
   echo "==> H2 database not found, creating from schema.sql + data.sql ..."
   mkdir -p "$DB_DIR"
 
-  # 确保依赖已下载，拿到 h2 jar
+  # 确保依赖已下载，拿到可运行的 h2 jar（排除 sources/javadoc）
   mvn -q -DskipTests dependency:resolve
-  H2_JAR="$(find "$HOME/.m2/repository/com/h2database/h2" -name 'h2-*.jar' 2>/dev/null | sort -V | tail -n 1 || true)"
+  H2_JAR="$(find "$HOME/.m2/repository/com/h2database/h2" -name 'h2-*.jar' ! -name '*-sources.jar' ! -name '*-javadoc.jar' 2>/dev/null | sort -V | tail -n 1 || true)"
   if [[ -z "$H2_JAR" || ! -f "$H2_JAR" ]]; then
     echo "ERROR: cannot find h2 jar in local Maven repo" >&2
     exit 1
   fi
-
+  # 再确认 jar 内含 RunScript
+  if ! jar tf "$H2_JAR" 2>/dev/null | grep -q 'org/h2/tools/RunScript.class'; then
+    echo "ERROR: selected jar has no RunScript: $H2_JAR" >&2
+    exit 1
+  fi
+  echo "==> using H2 jar: $H2_JAR"
   java -cp "$H2_JAR" org.h2.tools.RunScript \
     -url "$JDBC_URL" \
     -user sa \

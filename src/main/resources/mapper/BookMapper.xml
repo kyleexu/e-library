@@ -28,7 +28,10 @@
 		FROM books
 		<where>
 			<if test="q != null and q != ''">
-				AND (title LIKE CONCAT('%', #{q}, '%') OR author LIKE CONCAT('%', #{q}, '%'))
+				AND (
+					LOWER(title) LIKE CONCAT('%', LOWER(#{q}), '%')
+					OR LOWER(author) LIKE CONCAT('%', LOWER(#{q}), '%')
+				)
 			</if>
 			<if test="type != null">
 				AND type = #{type}
