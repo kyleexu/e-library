@@ -1,0 +1,17 @@
+INSERT INTO books (isbn, title, author, type, description, total_copies, available_copies) VALUES
+('9780132350884', 'Clean Code', 'Robert C. Martin', 'EBOOK',
+ 'A handbook of agile software craftsmanship.', 3, 3),
+('9780201633610', 'Design Patterns', 'Erich Gamma', 'EBOOK',
+ 'Elements of reusable object-oriented software.', 2, 2),
+('9780134685991', 'Effective Java', 'Joshua Bloch', 'EBOOK',
+ 'Best practices for the Java platform.', 2, 2),
+('9780262033848', 'Introduction to Algorithms', 'Thomas H. Cormen', 'REFERENCE',
+ 'Comprehensive algorithms textbook.', 1, 1),
+('9780596007126', 'Head First Design Patterns', 'Eric Freeman', 'NOVEL',
+ 'A brain-friendly guide to design patterns.', 4, 4),
+('9780000000001', 'Nature Vol. 600', 'Nature Publishing', 'JOURNAL',
+ 'Sample journal issue for the e-library demo.', 5, 5),
+('9780000000002', 'One Piece Vol. 1', 'Eiichiro Oda', 'COMIC',
+ 'Sample comic volume.', 3, 3),
+('9780000000003', 'National Geographic', 'NG Staff', 'MAGAZINE',
+ 'Sample magazine issue.', 2, 2);
