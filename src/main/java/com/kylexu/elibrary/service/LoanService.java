@@ -76,8 +76,8 @@ public class LoanService {
         if (loanDays == null) {
             return LOAN_DAYS;
         }
-        if (loanDays != 14 && loanDays != 30) {
-            throw new BusinessException(ApiCode.BAD_REQUEST, "loanDays must be 14 or 30");
+        if (loanDays <= 0) {
+            throw new BusinessException(ApiCode.BAD_REQUEST, "loanDays must be positive");
         }
         return loanDays;
     }

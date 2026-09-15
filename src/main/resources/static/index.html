@@ -71,8 +71,13 @@
       border-radius: 8px;
       border: 1px solid var(--line);
       padding: 8px 10px;
+      height: 38px;
+      line-height: 1.2;
       background: #fff;
       color: var(--ink);
+    }
+    select {
+      padding-right: 28px;
     }
     button {
       background: var(--accent);
@@ -85,6 +90,26 @@
     button.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
     button:hover { filter: brightness(1.05); }
     .hint { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+    .api {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: #f5f5f4;
+      border: 1px dashed var(--line);
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .api code {
+      font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+      font-size: 11px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+    .api .fields { margin-top: 4px; }
     .right-head {
       display: flex;
       justify-content: space-between;
@@ -233,6 +258,10 @@
           <div class="row" style="margin-top:8px">
             <button type="button" onclick="listBooks()">查询列表</button>
           </div>
+          <div class="api">
+            <div><code>GET /api/books</code></div>
+            <div class="fields">Query：<code>q</code>（可选，标题/作者）、<code>type</code>（可选，书籍类型）</div>
+          </div>
         </div>
 
         <div class="op">
@@ -243,6 +272,10 @@
             </label>
             <button type="button" onclick="getBook()">查询详情</button>
           </div>
+          <div class="api">
+            <div><code>GET /api/books/{bookId}</code></div>
+            <div class="fields">Path Param：<code>bookId</code></div>
+          </div>
         </div>
 
         <div class="op">
@@ -252,12 +285,13 @@
               <input id="borrowBookId" type="number" value="1" />
             </label>
             <label>loanDays
-              <select id="loanDays">
-                <option value="14">14</option>
-                <option value="30">30</option>
-              </select>
+              <input id="loanDays" type="number" min="1" value="14" />
             </label>
             <button type="button" onclick="borrowBook()">借阅</button>
+          </div>
+          <div class="api">
+            <div><code>POST /api/loans</code></div>
+            <div class="fields">Body：<code>bookId</code>、<code>loanDays</code>（正整数，不传默认 14）</div>
           </div>
         </div>
 
@@ -269,12 +303,18 @@
             </label>
             <button type="button" onclick="returnBook()">归还</button>
           </div>
-          <p class="hint">归还前在上方填写 bookId。</p>
+          <div class="api">
+            <div><code>POST /api/loans/return</code></div>
+            <div class="fields">Query：<code>bookId</code></div>
+          </div>
         </div>
 
         <div class="op">
           <h3>5. 我的当前借阅</h3>
           <button type="button" onclick="listMyLoans()">刷新我的借阅</button>
+          <div class="api">
+            <div><code>GET /api/me/loans</code></div>
+          </div>
         </div>
 
         <div class="op">
@@ -284,6 +324,10 @@
               <input id="borrowersBookId" type="number" value="1" />
             </label>
             <button type="button" onclick="listBorrowers()">查询借出用户</button>
+          </div>
+          <div class="api">
+            <div><code>GET /api/books/{bookId}/borrowers</code></div>
+            <div class="fields">Path Param：<code>bookId</code></div>
           </div>
         </div>
       </aside>

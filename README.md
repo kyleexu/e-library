@@ -18,7 +18,7 @@
 | 点                   | 取舍                                                                                                                |
 |---------------------|-------------------------------------------------------------------------------------------------------------------|
 | 用户身份                | 不做登录；用请求头 `X-User-Id` 标识当前用户                                                                                      |
-| 借阅天数                | body 传 `loanDays`，仅允许 `14` 或 `30`；不传默认 `14`                                                                       |
+| 借阅天数                | body 传 `loanDays`（正整数）；不传默认 `14`                                                                                 |
 | 库存                  | `Book.availableCopies`；借 -1、还 +1                                                                                  |
 | 重复借阅                | 同一用户对同一本书在未归还（`BORROWED`）时不能再借                                                                                    |
 | 内容类型                | `BookType`：COMPUTER / JOURNAL / COMIC / MAGAZINE / NOVEL / REFERENCE / HISTORY / SCIENCE / ART / BIOGRAPHY / KIDS |
