@@ -1,0 +1,24 @@
+package com.kylexu.elibrary.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * 当前用户借阅查询接口。
+ */
+@RestController
+@RequestMapping("/api/me/loans")
+public class MyLoanController {
+
+	/**
+	 * 查看当前已借阅的书籍列表（含借阅时间、已借天数等）。
+	 *
+	 * @param userId 当前用户 ID（请求头 X-User-Id）
+	 */
+	@GetMapping
+	public void listMyLoans(@RequestHeader("X-User-Id") String userId) {
+		// TODO: 实现我的借阅列表
+	}
+}
