@@ -1,5 +1,8 @@
 package com.kylexu.elibrary.controller;
 
+import com.kylexu.elibrary.common.ApiResponse;
+import com.kylexu.elibrary.model.Book;
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +23,10 @@ public class BookController {
 	 * @param type 可选类型过滤
 	 */
 	@GetMapping
-	public void listBooks(
+	public ApiResponse<List<Book>> listBooks(
 			@RequestParam(required = false) String q,
 			@RequestParam(required = false) String type) {
-		// TODO: 实现书籍列表查询
+		return ApiResponse.success();
 	}
 
 	/**
@@ -32,7 +35,7 @@ public class BookController {
 	 * @param bookId 书籍 ID
 	 */
 	@GetMapping("/{bookId}")
-	public void getBook(@PathVariable Long bookId) {
-		// TODO: 实现书籍详情查询
+	public ApiResponse<Book> getBook(@PathVariable Long bookId) {
+		return ApiResponse.success();
 	}
 }

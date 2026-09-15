@@ -1,5 +1,8 @@
 package com.kylexu.elibrary.controller;
 
+import com.kylexu.elibrary.common.ApiResponse;
+import com.kylexu.elibrary.dto.CurrentLoanItem;
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +21,8 @@ public class MyLoanController {
 	 * @param userId 当前用户 ID（请求头 X-User-Id）
 	 */
 	@GetMapping
-	public void listMyLoans(@RequestHeader("X-User-Id") String userId) {
-		// TODO: 实现我的借阅列表
+	public ApiResponse<List<CurrentLoanItem>> listMyLoans(
+			@RequestHeader("X-User-Id") String userId) {
+		return ApiResponse.success();
 	}
 }

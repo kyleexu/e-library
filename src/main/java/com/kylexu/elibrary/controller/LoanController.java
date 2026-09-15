@@ -1,5 +1,6 @@
 package com.kylexu.elibrary.controller;
 
+import com.kylexu.elibrary.common.ApiResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,10 +22,10 @@ public class LoanController {
 	 * @param body   借阅请求体，包含 bookId
 	 */
 	@PostMapping
-	public void borrowBook(
+	public ApiResponse<Void> borrowBook(
 			@RequestHeader("X-User-Id") String userId,
 			@RequestBody Object body) {
-		// TODO: 实现借阅
+		return ApiResponse.success();
 	}
 
 	/**
@@ -34,9 +35,9 @@ public class LoanController {
 	 * @param userId 当前用户 ID（请求头 X-User-Id）
 	 */
 	@PostMapping("/{loanId}/return")
-	public void returnBook(
+	public ApiResponse<Void> returnBook(
 			@PathVariable Long loanId,
 			@RequestHeader("X-User-Id") String userId) {
-		// TODO: 实现归还
+		return ApiResponse.success();
 	}
 }
