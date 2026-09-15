@@ -23,9 +23,8 @@ public class BookService {
      * @param q    可选关键字（标题 / 作者）
      * @param type 可选类型过滤
      */
-    public void listBooks(String q, BookType type) {
-        // TODO: 实现书籍列表查询
-        List<Book> list = bookMapper.findList(q, type);
+    public List<Book> listBooks(String q, BookType type) {
+        return bookMapper.findList(q, type);
     }
 
     /**
@@ -34,7 +33,6 @@ public class BookService {
      * @param bookId 书籍 ID
      */
     public Book getBook(Long bookId) {
-        // TODO: 实现书籍详情查询
         return bookMapper.findById(bookId);
     }
 }

@@ -37,6 +37,22 @@
 		ORDER BY id ASC
 	</select>
 
+	<select id="batchGet" resultType="com.kylexu.elibrary.model.Book">
+		SELECT id,
+		       isbn,
+		       title,
+		       author,
+		       type,
+		       description,
+		       total_copies,
+		       available_copies
+		FROM books
+		WHERE id IN
+		<foreach collection="idList" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
+
 	<update id="decreaseAvailableCopies">
 		UPDATE books
 		SET available_copies = available_copies - 1

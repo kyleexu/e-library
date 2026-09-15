@@ -1,21 +1,31 @@
 package com.kylexu.elibrary.service;
 
+import com.kylexu.elibrary.dto.CurrentLoanItem;
 import com.kylexu.elibrary.mapper.BookMapper;
 import com.kylexu.elibrary.mapper.LoanMapper;
 import com.kylexu.elibrary.model.Book;
 import com.kylexu.elibrary.model.Loan;
 import com.kylexu.elibrary.model.LoanStatus;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * 借阅领域服务：借阅、归还、查询当前用户已借阅列表。
  */
 @Service
 public class LoanService {
+
+    // 借阅天数默认 14 天
+    private static final int LOAN_DAYS = 14;
 
     @Autowired
     private BookMapper bookMapper;
@@ -50,8 +60,14 @@ public class LoanService {
     }
 
     private Loan buildLoan(String userId, Book book) {
+        LocalDateTime now = LocalDateTime.now();
         Loan loan = new Loan();
-        // TODO: full all field to the object.
+        loan.setUserId(userId);
+        loan.setBookId(book.getId());
+        loan.setStatus(LoanStatus.BORROWED);
+        loan.setBorrowedAt(now);
+        loan.setDueAt(now.plusDays(LOAN_DAYS));
+        loan.setReturnedAt(null);
         return loan;
     }
 
@@ -92,9 +108,43 @@ public class LoanService {
      *
      * @param userId 当前用户 ID
      */
-    public void listCurrentLoans(String userId) {
-        // TODO: 实现我的借阅列表
+    public List<CurrentLoanItem> listCurrentLoans(String userId) {
         List<Loan> loanList = loanMapper.findCurrentByUserId(userId);
+        if (loanList == null || loanList.isEmpty()) {
+            return Collections.emptyList();
+        }
 
+        List<Long> bookIds = loanList.stream()
+                .map(Loan::getBookId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        if (bookIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<Long, Book> bookMap = bookMapper.batchGet(bookIds).stream()
+                .collect(Collectors.toMap(Book::getId, Function.identity(), (a, b) -> a));
+
+        LocalDate today = LocalDate.now();
+        return loanList.stream()
+                .map(loan -> toCurrentLoanItem(loan, bookMap.get(loan.getBookId()), today))
+                .collect(Collectors.toList());
+    }
+
+    private CurrentLoanItem toCurrentLoanItem(Loan loan, Book book, LocalDate today) {
+        CurrentLoanItem item = new CurrentLoanItem();
+        item.setLoanId(loan.getId());
+        item.setBookId(loan.getBookId());
+        item.setBorrowedAt(loan.getBorrowedAt());
+        item.setDueAt(loan.getDueAt());
+        if (book != null) {
+            item.setTitle(book.getTitle());
+            item.setAuthor(book.getAuthor());
+        }
+        if (loan.getBorrowedAt() != null) {
+            item.setBorrowedDays(ChronoUnit.DAYS.between(loan.getBorrowedAt().toLocalDate(), today));
+        }
+        return item;
     }
 }

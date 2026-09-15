@@ -26,9 +26,10 @@ public interface BookMapper {
 
     /**
      * 按 ID 批量查询书籍。
-     * TODO
+     *
+     * @param idList 书籍 ID 列表
      */
-    List<Book> batchGet(List<Long> idList);
+    List<Book> batchGet(@Param("idList") List<Long> idList);
 
     /**
      * 借出时扣减可借库存（仅当 available_copies &gt; 0 时成功）。
