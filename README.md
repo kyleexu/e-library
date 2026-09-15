@@ -64,6 +64,12 @@ mvn spring-boot:run
 - User：`sa`
 - Password：（空）
 
+### 简易测试页
+
+启动服务后打开：http://localhost:8080/
+
+可在页面上测：列表 / 详情 / 借阅 / 归还 / 我的借阅。
+
 重建库（会清空借阅数据）：
 
 ```bash
