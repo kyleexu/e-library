@@ -106,6 +106,12 @@ curl "http://localhost:8080/api/books?type=COMPUTER"
 curl "http://localhost:8080/api/books/1"
 ```
 
+### 某书当前借出用户
+
+```bash
+curl "http://localhost:8080/api/books/1/borrowers"
+```
+
 ### 借阅
 
 ```bash

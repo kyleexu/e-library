@@ -3,6 +3,7 @@ package com.kylexu.elibrary.controller;
 import com.kylexu.elibrary.common.ApiCode;
 import com.kylexu.elibrary.common.ApiResponse;
 import com.kylexu.elibrary.common.BusinessException;
+import com.kylexu.elibrary.dto.BookBorrowerItem;
 import com.kylexu.elibrary.model.Book;
 import com.kylexu.elibrary.model.BookType;
 import com.kylexu.elibrary.service.BookService;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 书籍相关接口：浏览书籍、查询书籍详情。
+ * 书籍相关接口：浏览书籍、查询书籍详情、查询当前借出用户。
  */
 @RestController
 @RequestMapping("/api/books")
@@ -52,6 +53,16 @@ public class BookController {
 			throw new BusinessException(ApiCode.NOT_FOUND, "No this book");
 		}
 		return ApiResponse.success(book);
+	}
+
+	/**
+	 * 查询某本书当前借出在哪些用户手里。
+	 *
+	 * @param bookId 书籍 ID
+	 */
+	@GetMapping("/{bookId}/borrowers")
+	public ApiResponse<List<BookBorrowerItem>> listBorrowers(@PathVariable Long bookId) {
+		return ApiResponse.success(bookService.listCurrentBorrowers(bookId));
 	}
 
 	private BookType parseBookType(String type) {

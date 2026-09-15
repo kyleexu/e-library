@@ -276,6 +276,16 @@
           <h3>5. 我的当前借阅</h3>
           <button type="button" onclick="listMyLoans()">刷新我的借阅</button>
         </div>
+
+        <div class="op">
+          <h3>6. 书的当前借出用户</h3>
+          <div class="row">
+            <label>bookId
+              <input id="borrowersBookId" type="number" value="1" />
+            </label>
+            <button type="button" onclick="listBorrowers()">查询借出用户</button>
+          </div>
+        </div>
       </aside>
 
       <section class="panel">
@@ -319,13 +329,13 @@
   function inferKind(path, data) {
     if (!(data && typeof data === 'object')) return 'raw';
     if (data.code !== 0) return 'error';
-    const payload = data.data;
+    if (path.includes('/borrowers')) return 'borrowers';
     if (path.startsWith('/api/books/') && path !== '/api/books') return 'book';
     if (path.startsWith('/api/books')) return 'books';
     if (path.startsWith('/api/me/loans')) return 'loans';
     if (path.includes('/return') || path === '/api/loans') return 'action';
-    if (Array.isArray(payload)) return 'list';
-    if (payload && typeof payload === 'object') return 'object';
+    if (Array.isArray(data.data)) return 'list';
+    if (data.data && typeof data.data === 'object') return 'object';
     return 'action';
   }
 
@@ -371,6 +381,20 @@
           <td>${escapeHtml(l.loanId)}</td>
           <td>${escapeHtml(l.bookId)}</td>
           <td>${escapeHtml(l.title || '')}</td>
+          <td>${escapeHtml(l.borrowedAt || '')}</td>
+          <td>${escapeHtml(l.dueAt || '')}</td>
+          <td>${escapeHtml(l.borrowedDays)}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+    }
+    if (kind === 'borrowers' && Array.isArray(data.data)) {
+      const list = data.data;
+      if (!list.length) return '<div class="msg">当前无人借阅此书</div>';
+      return `<table>
+        <thead><tr><th>userId</th><th>loanId</th><th>借出</th><th>应还</th><th>天数</th></tr></thead>
+        <tbody>${list.map(l => `<tr>
+          <td>${escapeHtml(l.userId)}</td>
+          <td>${escapeHtml(l.loanId)}</td>
           <td>${escapeHtml(l.borrowedAt || '')}</td>
           <td>${escapeHtml(l.dueAt || '')}</td>
           <td>${escapeHtml(l.borrowedDays)}</td>
@@ -484,6 +508,11 @@
 
   async function listMyLoans() {
     await call('GET', '/api/me/loans');
+  }
+
+  async function listBorrowers() {
+    const id = document.getElementById('borrowersBookId').value;
+    await call('GET', '/api/books/' + id + '/borrowers');
   }
 
   listBooks().catch(() => {});

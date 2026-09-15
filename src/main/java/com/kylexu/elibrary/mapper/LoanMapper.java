@@ -32,6 +32,11 @@ public interface LoanMapper {
 	List<Loan> findCurrentByUserId(@Param("userId") String userId);
 
 	/**
+	 * 查询某本书当前未归还的借阅（谁手里有这本书）。
+	 */
+	List<Loan> findCurrentByBookId(@Param("bookId") Long bookId);
+
+	/**
 	 * 将借阅单标记为已归还。
 	 *
 	 * @return 影响行数，0 表示记录不存在或已归还
