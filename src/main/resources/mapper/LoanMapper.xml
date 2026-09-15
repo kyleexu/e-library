@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kylexu.elibrary.mapper.LoanMapper">
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO loans (user_id, book_id, status, borrowed_at, due_at, returned_at)
+		VALUES (#{userId}, #{bookId}, #{status}, #{borrowedAt}, #{dueAt}, #{returnedAt})
+	</insert>
+
+	<select id="findById" resultType="com.kylexu.elibrary.model.Loan">
+		SELECT id,
+		       user_id,
+		       book_id,
+		       status,
+		       borrowed_at,
+		       due_at,
+		       returned_at
+		FROM loans
+		WHERE id = #{id}
+	</select>
+
+	<select id="findActiveByUserAndBook" resultType="com.kylexu.elibrary.model.Loan">
+		SELECT id,
+		       user_id,
+		       book_id,
+		       status,
+		       borrowed_at,
+		       due_at,
+		       returned_at
+		FROM loans
+		WHERE user_id = #{userId}
+		  AND book_id = #{bookId}
+		  AND status = 'BORROWED'
+	</select>
+
+	<select id="findCurrentByUserId" resultType="com.kylexu.elibrary.model.Loan">
+		SELECT id,
+		       user_id,
+		       book_id,
+		       status,
+		       borrowed_at,
+		       due_at,
+		       returned_at
+		FROM loans
+		WHERE user_id = #{userId}
+		  AND status = 'BORROWED'
+		ORDER BY borrowed_at DESC
+	</select>
+
+	<update id="markReturned">
+		UPDATE loans
+		SET status = #{status},
+		    returned_at = #{returnedAt}
+		WHERE id = #{id}
+		  AND status = 'BORROWED'
+	</update>
+
+</mapper>
