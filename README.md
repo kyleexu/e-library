@@ -1,8 +1,9 @@
-Demo: http://124.220.15.193:8080/
 
 # E-Library Service
 
 简易电子图书馆后端：浏览 / 查询书籍、借阅、归还、查看当前借阅。
+
+**测试页：** [http://124.220.15.193:8080/](http://124.220.15.193:8080/)（已部署，可直接调用接口）
 
 ## Tech Stack
 
@@ -14,14 +15,14 @@ Demo: http://124.220.15.193:8080/
 
 ## Assumptions
 
-| 点 | 取舍 |
-|---|---|
-| 用户身份 | 不做登录；用请求头 `X-User-Id` 标识当前用户 |
-| 借阅天数 | body 传 `loanDays`，仅允许 `14` 或 `30`；不传默认 `14` |
-| 库存 | `Book.availableCopies`；借 -1、还 +1 |
-| 重复借阅 | 同一用户对同一本书在未归还（`BORROWED`）时不能再借 |
-| 内容类型 | `BookType`：COMPUTER / JOURNAL / COMIC / MAGAZINE / NOVEL / REFERENCE / HISTORY / SCIENCE / ART / BIOGRAPHY / KIDS |
-| 认证 / 支付 / 预约 / 管理后台 | 刻意不做，控制作业范围 |
+| 点                   | 取舍                                                                                                                |
+|---------------------|-------------------------------------------------------------------------------------------------------------------|
+| 用户身份                | 不做登录；用请求头 `X-User-Id` 标识当前用户                                                                                      |
+| 借阅天数                | body 传 `loanDays`，仅允许 `14` 或 `30`；不传默认 `14`                                                                       |
+| 库存                  | `Book.availableCopies`；借 -1、还 +1                                                                                  |
+| 重复借阅                | 同一用户对同一本书在未归还（`BORROWED`）时不能再借                                                                                    |
+| 内容类型                | `BookType`：COMPUTER / JOURNAL / COMIC / MAGAZINE / NOVEL / REFERENCE / HISTORY / SCIENCE / ART / BIOGRAPHY / KIDS |
+| 认证 / 支付 / 预约 / 管理后台 | 刻意不做，控制作业范围                                                                                                       |
 
 ## Project Layout
 
@@ -150,7 +151,8 @@ mvn test
 
 ## Design Notes
 
-- **分层**：Controller → Service → Mapper；借还写路径在 `LoanService` 内直接使用 `BookMapper` + `LoanMapper`，避免 Service 互相绕圈。
+- **分层**：Controller → Service → Mapper；借还写路径在 `LoanService` 内直接使用 `BookMapper` + `LoanMapper`，避免 Service
+  互相绕圈。
 - **事务**：`borrowBook` / `returnBook` 使用 `@Transactional`，避免「写了借阅单但扣库存失败」。
 - **错误**：业务异常统一为 `BusinessException`，经 `@RestControllerAdvice` 转为 `ApiResponse.fail`。
 - **库存并发**：扣库存 SQL 带 `available_copies > 0` 条件，影响行数为 0 则失败回滚。
